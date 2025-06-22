@@ -27,7 +27,7 @@ app.post('/api/tips', async (req, res) => {
             income == null || expenses == null || savings == null ||
             isNaN(income) || isNaN(expenses) || isNaN(savings)
         ) {
-            return res.status(400).json({ error: 'Invalid input – provide numeric income, expenses, and savings.' });
+            return res.status(400).json({ error: 'Invalid input - provide numeric income, expenses, and savings.' });
         }
 
         let tip;
