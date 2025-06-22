@@ -1,7 +1,6 @@
-
 const express = require('express');
 const path = require('path');
-const { Configuration, OpenAIApi } = require('openai');
+const axios = require('axios');
 const financeLogic = require('./financeLogic');
 require('dotenv').config();
 
@@ -11,14 +10,6 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
-
-let openai;
-if (process.env.OPENAI_API_KEY) {
-    const configuration = new Configuration({
-        apiKey: process.env.OPENAI_API_KEY,
-    });
-    openai = new OpenAIApi(configuration);
-}
 
 app.post('/api/tips', async (req, res) => {
     try {
@@ -31,26 +22,39 @@ app.post('/api/tips', async (req, res) => {
         }
 
         let tip;
-        if (openai) {
-            const prompt = financeLogic.createPrompt(income, expenses, savings);
-            const completion = await openai.createChatCompletion({
-                model: 'gpt-3.5-turbo',
-                messages: [
-                    { role: 'system', content: 'You are a helpful personal finance assistant. Provide actionable money-saving and budgeting advice.' },
-                    { role: 'user', content: prompt }
-                ],
-                max_tokens: 150,
-                temperature: 0.7
-            });
-            tip = completion.data.choices[0].message.content.trim();
-        } else {
+        const prompt = financeLogic.createPrompt(income, expenses, savings);
+        try {
+            const response = await axios.post(
+                'http://localhost:11434/api/chat',
+                {
+                    model: 'llama3',
+                    messages: [
+                        { role: 'system', content: 'You are a helpful personal finance assistant. Provide actionable money-saving and budgeting advice.' },
+                        { role: 'user', content: prompt }
+                    ]
+                },
+                { timeout: 15000 }
+            );
+            tip = response.data.choices
+                ? response.data.choices[0].message.content.trim()
+                : response.data.message.content.trim();
+        } catch (err) {
+            console.error('Ollama API error:', err.message);
             tip = financeLogic.fallbackTip(income, expenses, savings);
         }
+
         return res.json({ tip });
     } catch (error) {
-        console.error('Error generating tip:', error);
-        const fallback = financeLogic.fallbackTip(req.body.income, req.body.expenses, req.body.savings);
-        return res.status(500).json({ error: 'Server error; providing fallback advice.', tip: fallback });
+        console.error('Server error:', error);
+        const fallback = financeLogic.fallbackTip(
+            req.body.income,
+            req.body.expenses,
+            req.body.savings
+        );
+        return res.status(500).json({
+            error: 'Server error; providing fallback advice.',
+            tip: fallback
+        });
     }
 });
 
