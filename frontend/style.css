@@ -2,71 +2,104 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+
 }
 
 body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #ece9e6, #ffffff);
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a1a2e 100%);
+    color: #e0e0e0;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
 }
 
-.container {
-    width: min(90%, 600px);
+header {
     padding: 20px;
+    text-align: center;
+    background: #050515;
+    box-shadow: 0 2px 10px rgba(0, 255, 255, 0.2);
+}
+
+header h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: #18dcff;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px #18dcff, 0 0 16px #18dcff;
+}
+
+main.container {
+    flex: 1;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px;
+}
+
+@media (max-width: 800px) {
+    main.container {
+        flex-direction: column;
+        padding: 20px;
+    }
 }
 
 .card {
-    background: #fefefe;
+    background: #121224;
     border-radius: 12px;
-    padding: 20px 25px;
-    margin-bottom: 20px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    padding: 25px;
+    box-shadow: 0 6px 20px rgba(24, 220, 255, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(24, 220, 255, 0.2);
 }
 
-.form-card h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
+.form-card {
+    flex: 1;
+    max-width: 320px;
+}
+
+.form-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #18dcff;
+}
+
+.field {
     margin-bottom: 15px;
-    color: #333;
 }
 
-form label {
+.field label {
     display: block;
-    margin-top: 15px;
+    margin-bottom: 6px;
     font-weight: 500;
-    color: #444;
 }
 
-form input {
+.field input {
     width: 100%;
     padding: 10px;
-    margin-top: 5px;
-    border: 2px solid #ddd;
+    background: #1e1e33;
+    border: 2px solid #2e2e4d;
     border-radius: 6px;
+    color: #e0e0e0;
     font-size: 1rem;
     transition: border-color 0.3s;
 }
 
-form input:focus {
-    border-color: #5563DE;
+.field input:focus {
+    border-color: #18dcff;
     outline: none;
 }
 
 button {
     width: 100%;
     padding: 12px;
-    margin-top: 20px;
-    background: #5563DE;
-    color: #fff;
+    background: #18dcff;
+    color: #050515;
     border: none;
     border-radius: 6px;
     font-size: 1rem;
@@ -76,16 +109,17 @@ button {
 }
 
 button:hover {
-    background: #4252a5;
+    background: #0aa8c0;
 }
 
 .loader {
-    margin: 20px auto;
-    border: 6px solid #f3f3f3;
-    border-top: 6px solid #5563DE;
+    align-self: center;
+    margin: 30px;
+    border: 6px solid #2e2e4d;
+    border-top: 6px solid #18dcff;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     animation: spin 1s linear infinite;
 }
 
@@ -100,32 +134,36 @@ button:hover {
 }
 
 .result-card {
-    padding: 15px 20px;
-    transition: max-height 0.4s ease, padding 0.4s ease;
-    overflow: hidden;
+    flex: 2;
+    padding: 25px;
 }
 
 .result-card h2 {
     font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: #333;
+    margin-bottom: 12px;
+    color: #18dcff;
 }
 
 #tipText {
+    font-family: 'Inter', sans-serif;
     font-size: 1.125rem;
     line-height: 1.6;
-    min-height: 1.6em;
     white-space: pre-wrap;
     position: relative;
+    min-height: 1.6em;
 }
 
 #typed::after {
     content: '|';
     position: absolute;
-    display: inline-block;
     margin-left: 2px;
+    color: #18dcff;
     animation: blink 1s steps(2) infinite;
-    font-weight: 600;
+}
+
+#typed.done::after {
+    content: '';
+    animation: none;
 }
 
 @keyframes blink {
@@ -147,9 +185,11 @@ button:hover {
 @keyframes fadeInAnim {
     from {
         opacity: 0;
+        transform: translateY(10px);
     }
 
     to {
         opacity: 1;
+        transform: translateY(0);
     }
 }

@@ -4,36 +4,46 @@
 <head>
     <meta charset="UTF-8" />
     <title>Personal Finance Tip Generator</title>
+
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet" />
+
     <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <div class="container">
-        <div class="card form-card">
-            <h1>Finance Tip Generator</h1>
+    <header>
+        <h1>💰 Personal Finance Tip Generator</h1>
+    </header>
+
+    <main class="container">
+        <section class="card form-card">
+            <h2>Generate Your Tip</h2>
             <form id="tipForm">
-                <label for="income">Monthly Income (₹):</label>
-                <input type="number" id="income" name="income" placeholder="e.g. 5000" required />
-
-                <label for="expenses">Monthly Expenses (₹):</label>
-                <input type="number" id="expenses" name="expenses" placeholder="e.g. 3000" required />
-
-                <label for="savings">Savings Goal (₹):</label>
-                <input type="number" id="savings" name="savings" placeholder="e.g. 1000" required />
-
+                <div class="field">
+                    <label for="income">Monthly Income (₹):</label>
+                    <input type="number" id="income" placeholder="e.g. 5000" required />
+                </div>
+                <div class="field">
+                    <label for="expenses">Monthly Expenses (₹):</label>
+                    <input type="number" id="expenses" placeholder="e.g. 3000" required />
+                </div>
+                <div class="field">
+                    <label for="savings">Savings Goal (₹):</label>
+                    <input type="number" id="savings" placeholder="e.g. 1000" required />
+                </div>
                 <button type="submit">Get Tip</button>
             </form>
-        </div>
+        </section>
 
         <div id="loader" class="loader hidden"></div>
 
-        <div id="result" class="card result-card hidden">
+        <section id="result" class="card result-card hidden">
             <h2>Your Tip:</h2>
             <p id="tipText"><span id="typed"></span></p>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script src="script.js"></script>
 </body>
