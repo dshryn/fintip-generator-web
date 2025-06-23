@@ -1,83 +1,82 @@
-
-
 const express = require('express');
 const path = require('path');
 const axios = require('axios');
 const financeLogic = require('./financeLogic');
-require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(express.json());
+const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
+app.use(express.json());
 
 app.post('/api/tips', async (req, res) => {
+    const { income, expenses, savings } = req.body;
+    console.log(`[API] Received input: income=${income}, expenses=${expenses}, savings=${savings}`);
+
+    const inc = parseFloat(income), exp = parseFloat(expenses), sav = parseFloat(savings);
+    if (isNaN(inc) || isNaN(exp) || isNaN(sav) || inc < 0 || exp < 0 || sav < 0) {
+        console.error('[API] Invalid input values');
+        return res.status(400).json({ error: 'Invalid input values' });
+    }
+
+    const prompt = financeLogic.createPrompt(inc, exp, sav);
+    console.log(`[API] Generated prompt for Ollama: ${prompt}`);
+
     try {
-        const { income, expenses, savings } = req.body;
-
-        if (
-            income == null || expenses == null || savings == null ||
-            isNaN(income) || isNaN(expenses) || isNaN(savings)
-        ) {
-            return res.status(400).json({
-                error: 'Invalid input - provide numeric income, expenses, and savings.'
-            });
-        }
-
-        // Build the prompt
-        const prompt = financeLogic.createPrompt(income, expenses, savings);
-        let tip;
-
-        try {
-            const response = await axios.post(
-                'http://localhost:11434/api/chat',
-                {
-                    model: 'llama3',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'You are a helpful personal finance assistant. Provide actionable money-saving and budgeting advice.'
-                        },
-                        {
-                            role: 'user',
-                            content: prompt
-                        }
-                    ],
-                    stream: false
-                },
-                { timeout: 15000 }
-            );
-
-            // Extract the tip text
-            if (response.data.choices && response.data.choices.length > 0) {
-                tip = response.data.choices[0].message.content.trim();
-            } else if (response.data.message) {
-                tip = response.data.message.content.trim();
-            } else {
-                throw new Error('Unexpected Ollama response format');
-            }
-        } catch (err) {
-            console.error('Ollama API error:', err.message);
-            tip = financeLogic.fallbackTip(income, expenses, savings);
-        }
-
-        return res.json({ tip });
-    } catch (error) {
-        console.error('Server error:', error);
-        const fallback = financeLogic.fallbackTip(
-            req.body.income,
-            req.body.expenses,
-            req.body.savings
-        );
-        return res.status(500).json({
-            error: 'Server error; providing fallback advice.',
-            tip: fallback
+        console.log('[API] Calling Ollama /api/generate with streaming...');
+        const apiResponse = await axios({
+            method: 'post',
+            url: 'http://localhost:11434/api/generate',
+            data: { model: 'llama3', prompt: prompt, stream: true },
+            responseType: 'stream',
+            timeout: 30000
         });
+
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Transfer-Encoding', 'chunked');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.flushHeaders();
+
+        let buffer = '';
+        apiResponse.data.on('data', (chunk) => {
+            buffer += chunk.toString();
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+
+            for (const line of lines) {
+                if (!line.trim()) continue;
+                try {
+                    const msg = JSON.parse(line);
+                    if (msg.response) {
+                        process.stdout.write(msg.response);
+                        res.write(msg.response);
+                    }
+                } catch (err) {
+                    console.error('[API] Failed to parse chunk:', err);
+                }
+            }
+        });
+
+        apiResponse.data.on('end', () => {
+            console.log('[API] Ollama stream ended. Closing response.');
+            res.end();
+        });
+
+        apiResponse.data.on('error', (err) => {
+            console.error('[API] Stream error:', err);
+            const fallback = financeLogic.fallbackTip();
+            res.write(fallback);
+            res.end();
+        });
+
+    } catch (err) {
+        console.error('[API] Ollama API request failed:', err.message);
+        const fallback = financeLogic.fallbackTip();
+        res.write(fallback);
+        return res.end();
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+app.listen(PORT, () => {
+    console.log(`[Server] Listening at: http://localhost:${PORT}`);
 });
