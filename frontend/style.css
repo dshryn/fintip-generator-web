@@ -193,3 +193,20 @@ button:hover {
         transform: translateY(0);
     }
 }
+
+.field textarea {
+    width: 100%;
+    padding: 10px;
+    background: #1e1e33;
+    border: 2px solid #2e2e4d;
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-size: 1rem;
+    resize: vertical;
+    transition: border-color 0.3s;
+}
+
+.field textarea:focus {
+    border-color: #18dcff;
+    outline: none;
+}

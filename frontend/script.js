@@ -37,9 +37,11 @@ form.addEventListener('submit', async (e) => {
     resultCard.classList.add('hidden');
     loader.classList.remove('hidden');
 
+
     const income = parseFloat(document.getElementById('income').value);
     const expenses = parseFloat(document.getElementById('expenses').value);
     const savings = parseFloat(document.getElementById('savings').value);
+    const habits = document.getElementById('habits').value.trim();
 
     typeWriter();
 
@@ -47,7 +49,7 @@ form.addEventListener('submit', async (e) => {
         const response = await fetch('/api/tips', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ income, expenses, savings })
+            body: JSON.stringify({ income, expenses, savings, habits }),
         });
 
         if (!response.ok) {

@@ -10,24 +10,34 @@ app.use(express.static(path.join(__dirname, '..', 'frontend')));
 app.use(express.json());
 
 app.post('/api/tips', async (req, res) => {
-    const { income, expenses, savings } = req.body;
-    console.log(`[API] Received input: income=${income}, expenses=${expenses}, savings=${savings}`);
+    const { income, expenses, savings, habits } = req.body;
+    console.log(`[API] Received input: income=${income}, expenses=${expenses}, savings=${savings}, habits="${habits}"`);
 
-    const inc = parseFloat(income), exp = parseFloat(expenses), sav = parseFloat(savings);
-    if (isNaN(inc) || isNaN(exp) || isNaN(sav) || inc < 0 || exp < 0 || sav < 0) {
+    const inc = parseFloat(income),
+        exp = parseFloat(expenses),
+        sav = parseFloat(savings);
+
+    if (
+        isNaN(inc) || isNaN(exp) || isNaN(sav) ||
+        inc < 0 || exp < 0 || sav < 0
+    ) {
         console.error('[API] Invalid input values');
         return res.status(400).json({ error: 'Invalid input values' });
     }
 
-    const prompt = financeLogic.createPrompt(inc, exp, sav);
-    console.log(`[API] Generated prompt for Ollama: ${prompt}`);
+    const prompt = financeLogic.createPrompt(inc, exp, sav, habits);
+    console.log(`[API] Generated prompt for Ollama:\n${prompt}`);
 
     try {
         console.log('[API] Calling Ollama /api/generate with streaming...');
         const apiResponse = await axios({
             method: 'post',
             url: 'http://localhost:11434/api/generate',
-            data: { model: 'llama3', prompt: prompt, stream: true },
+            data: {
+                model: 'llama3',
+                prompt,
+                stream: true
+            },
             responseType: 'stream',
             timeout: 30000
         });
@@ -38,11 +48,10 @@ app.post('/api/tips', async (req, res) => {
         res.flushHeaders();
 
         let buffer = '';
-        apiResponse.data.on('data', (chunk) => {
+        apiResponse.data.on('data', chunk => {
             buffer += chunk.toString();
             const lines = buffer.split('\n');
             buffer = lines.pop();
-
             for (const line of lines) {
                 if (!line.trim()) continue;
                 try {
@@ -58,22 +67,22 @@ app.post('/api/tips', async (req, res) => {
         });
 
         apiResponse.data.on('end', () => {
-            console.log('[API] Ollama stream ended. Closing response.');
+            console.log('[API] Ollama stream ended.');
             res.end();
         });
 
-        apiResponse.data.on('error', (err) => {
+        apiResponse.data.on('error', err => {
             console.error('[API] Stream error:', err);
-            const fallback = financeLogic.fallbackTip();
+            const fallback = financeLogic.fallbackTip(inc, exp, sav, habits);
             res.write(fallback);
             res.end();
         });
 
     } catch (err) {
         console.error('[API] Ollama API request failed:', err.message);
-        const fallback = financeLogic.fallbackTip();
+        const fallback = financeLogic.fallbackTip(inc, exp, sav, habits);
         res.write(fallback);
-        return res.end();
+        res.end();
     }
 });
 
