@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const axios = require('axios');
-const financeLogic = require('./financeLogic');
+const finlogic = require('./finlogic');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,7 +25,7 @@ app.post('/api/tips', async (req, res) => {
         return res.status(400).json({ error: 'Invalid input values' });
     }
 
-    const prompt = financeLogic.createPrompt(inc, exp, sav, habits);
+    const prompt = finlogic.createPrompt(inc, exp, sav, habits);
     console.log(`[API] Generated prompt for Ollama:\n${prompt}`);
 
     try {
@@ -73,14 +73,14 @@ app.post('/api/tips', async (req, res) => {
 
         apiResponse.data.on('error', err => {
             console.error('[API] Stream error:', err);
-            const fallback = financeLogic.fallbackTip(inc, exp, sav, habits);
+            const fallback = finlogic.fallbackTip(inc, exp, sav, habits);
             res.write(fallback);
             res.end();
         });
 
     } catch (err) {
         console.error('[API] Ollama API request failed:', err.message);
-        const fallback = financeLogic.fallbackTip(inc, exp, sav, habits);
+        const fallback = finlogic.fallbackTip(inc, exp, sav, habits);
         res.write(fallback);
         res.end();
     }
