@@ -1,20 +1,47 @@
-
-
 const form = document.getElementById('tipForm');
 const loader = document.getElementById('loader');
 const resultCard = document.getElementById('result');
-const tipText = document.getElementById('tipText');
+const typedSpan = document.getElementById('typed');
+
+let charBuffer = [];
+let streamingDone = false;
+
+async function typeWriter() {
+    let firstChar = true;
+
+    while (!streamingDone || charBuffer.length > 0) {
+        if (charBuffer.length > 0) {
+            // On the first character, switch from loader → result card
+            if (firstChar) {
+                loader.classList.add('hidden');
+                resultCard.classList.remove('hidden');
+                resultCard.classList.add('fade-in');
+                firstChar = false;
+            }
+
+            typedSpan.textContent += charBuffer.shift();
+        }
+        await new Promise(r => setTimeout(r, 30));
+    }
+    // remove the cursor blink after complete
+    typedSpan.classList.add('done');
+}
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    // reset
+    typedSpan.textContent = '';
+    typedSpan.classList.remove('done');
+    charBuffer = [];
+    streamingDone = false;
+    resultCard.classList.add('hidden');
+    loader.classList.remove('hidden');
 
     const income = parseFloat(document.getElementById('income').value);
     const expenses = parseFloat(document.getElementById('expenses').value);
     const savings = parseFloat(document.getElementById('savings').value);
 
-    resultCard.classList.add('hidden');
-    tipText.textContent = '';
-    loader.classList.remove('hidden');
+    typeWriter();
 
     try {
         const response = await fetch('/api/tips', {
@@ -24,31 +51,26 @@ form.addEventListener('submit', async (e) => {
         });
 
         if (!response.ok) {
-            const errText = await response.text();
-            tipText.textContent = `Error ${response.status}: ${errText}`;
+            const err = await response.text();
+            for (const ch of `Error ${response.status}: ${err}`) charBuffer.push(ch);
+            streamingDone = true;
             return;
         }
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        let done = false;
-
-        while (!done) {
-            const { value, done: readerDone } = await reader.read();
+        while (true) {
+            const { value, done } = await reader.read();
             if (value) {
                 const chunk = decoder.decode(value, { stream: true });
-                tipText.textContent += chunk;
+                for (const ch of chunk) charBuffer.push(ch);
             }
-            done = readerDone;
+            if (done) break;
         }
-
     } catch (err) {
         console.error('Fetch error:', err);
-        tipText.textContent = 'Failed to fetch tip.';
+        for (const ch of 'Failed to fetch tip.') charBuffer.push(ch);
     } finally {
-        loader.classList.add('hidden');
-        resultCard.classList.remove('hidden');
-        resultCard.classList.add('fade-in');
-        setTimeout(() => resultCard.classList.remove('fade-in'), 1000);
+        streamingDone = true;
     }
 });
