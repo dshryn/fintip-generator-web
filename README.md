@@ -10,7 +10,7 @@ A web application that delivers personalized, actionable budgeting advice by com
 - **Generative + Rule-based Hybrid**  
   Rich AI prompts combined with fallback logic implementing core finance rules when the model is unavailable.
 - **Dynamic Layout**  
-  Horizontal form card morphs into a vertical layout on submit, centering both form and result.
+  Form card adjusts according to the output length.
 - **Spending Habits Input**  
   Users can describe their spending behaviors (e.g., dining out, subscriptions) for tailored advice.
 
