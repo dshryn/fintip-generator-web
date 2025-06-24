@@ -4,8 +4,8 @@ function createPrompt(income, expenses, savings, habits) {
 I have a monthly income of ₹${income}, monthly expenses of ₹${expenses}, and I want to save ₹${savings} per month.
 My current spending habits: ${habits || 'None provided'}.
 Please give me clear, actionable personal finance advice that:
-1. Applies the 50/30/20 budgeting rule (needs, wants, savings).
-2. Prioritizes building an emergency fund.
+1. Applies the 50/30/20 budgeting rule (needs, wants, savings) and other investment plans.
+2. Prioritizes building an emergency fund (3-6 months of expenses).
 3. Suggests ways to optimize the habits I provided.
 4. Includes any simple money-saving or debt-paydown rules.
 Give me a concise tip I can act on.
