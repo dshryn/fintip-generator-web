@@ -14,7 +14,6 @@ Give me a concise tip I can act on.
 
 function fallbackTip(income, expenses, savings, habits) {
     const needsMax = income * 0.5;
-    const wantsMax = income * 0.3;
     let advice = 'Failed to connect API\nHere\'s a generaladvice: ';
     if (expenses > needsMax) {
         advice += `Your core expenses (₹${expenses}) exceed 50% of income. Try to cut needs costs (rent, bills). `;

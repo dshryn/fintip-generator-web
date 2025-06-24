@@ -11,7 +11,6 @@ async function typeWriter() {
 
     while (!streamingDone || charBuffer.length > 0) {
         if (charBuffer.length > 0) {
-            // On the first character, switch from loader → result card
             if (firstChar) {
                 loader.classList.add('hidden');
                 resultCard.classList.remove('hidden');
@@ -23,13 +22,11 @@ async function typeWriter() {
         }
         await new Promise(r => setTimeout(r, 30));
     }
-    // remove the cursor blink after complete
     typedSpan.classList.add('done');
 }
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    // reset
     typedSpan.textContent = '';
     typedSpan.classList.remove('done');
     charBuffer = [];
