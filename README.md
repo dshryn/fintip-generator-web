@@ -1,6 +1,6 @@
-# Personal Finance Tip Generator
+# Personal Finance Tip Generator using Generative AI
 
-A web application that delivers personalized, actionable budgeting advice by combining user inputs (income, expenses, savings goals, and spending habits) with both generative AI (LLaMA-3 via Ollama) and rule-based finance heuristics (50/30/20 rule, emergency-fund guidelines). The frontend streams AI responses in real time with a typewriter animation and dynamic layout.
+A web application that delivers personalized, actionable budgeting advice by combining user inputs (income, expenses, savings goals, and spending habits) with both. generative AI (LLaMA-3 via Ollama) and rule-based finance heuristics (50/30/20 rule, emergency-fund guidelines). The frontend streams AI responses in real time with a typewriter animation and dynamic layout.
 
 
 ## Features
@@ -13,22 +13,6 @@ A web application that delivers personalized, actionable budgeting advice by com
   Horizontal form card morphs into a vertical layout on submit, centering both form and result.
 - **Spending Habits Input**  
   Users can describe their spending behaviors (e.g., dining out, subscriptions) for tailored advice.
-- **Multiple Themes**  
-  Light and dark modes with modern, responsive design.
-
-
-## 📁 Repository Structure
-
-/
-├── backend/
-│ ├── server.js 
-│ └── financeLogic.js
-├── frontend/
-│ ├── index.html 
-│ ├── style.css 
-│ └── script.js 
-├── .gitignore
-└── README.md
 
 
 
@@ -57,15 +41,14 @@ A web application that delivers personalized, actionable budgeting advice by com
 5. Open the presented link in your browser.
 
 
+
 ## Usage
 
-Enter your Monthly Income, Monthly Expenses, Savings Goal, and optional Spending Habits.
-
-Click Get Tip.
-
-Watch the loader spin, then see your personalized finance tip appear letter by letter.
-
-If the AI service is unavailable, you’ll receive a rule-based fallback tip immediately.
+- Enter your Monthly Income, Monthly Expenses, Savings Goal, and optional Spending Habits.
+- Click Get Tip.
+- Watch the loader spin, then see your personalized finance tip appear letter by letter.
+- If the AI service is unavailable, you’ll receive a rule-based fallback tip immediately.
+  
 
 ## Configuration
 
