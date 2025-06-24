@@ -20,7 +20,7 @@ A web application that delivers personalized, actionable budgeting advice by com
 
 1. **Clone the repo**  
    ```bash
-   git clone https://github.com/your-username/personal-finance-tip-generator.git
+   git clone https://github.com/dshryn/personal-finance-tip-generator.git
    cd personal-finance-tip-generator
 
 2. **Install Backend Dependencies**
